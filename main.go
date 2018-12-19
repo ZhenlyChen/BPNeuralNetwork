@@ -7,8 +7,9 @@ import (
 
 func main() {
 	// train()
-	identify()
+	// identify()
 	// test()
+	// outputImage()
 }
 
 func outputLabel(labelData []byte) {

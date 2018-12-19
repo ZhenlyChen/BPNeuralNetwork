@@ -4,6 +4,9 @@ import (
 	"bufio"
 	"encoding/binary"
 	"fmt"
+	"image"
+	"image/color"
+	"image/jpeg"
 	"io"
 	"io/ioutil"
 	"math"
@@ -11,7 +14,7 @@ import (
 	"strconv"
 )
 
-func test() {
+func outputImage() {
 	dim := 28 * 28
 	// 隐含层节点数
 	hiddenNode := 256
@@ -74,7 +77,7 @@ func test() {
 
 	// 测试图片
 	successCase := 0
-	for i := 0; i < testImageCount; i++ {
+	for i := 0; i < 100; i++ {
 		// 初始化输入层
 		imagePart := testImageData[i*testImageRows*testImageRows : (i+1)*testImageRows*testImageRows]
 		// 输出图片
@@ -129,6 +132,15 @@ func test() {
 			successCase++
 		}
 
+		img := image.NewGray(image.Rect(0, 0, 28, 28))
+		for x := 0; x < 28; x++ {
+			for y := 0; y < 28; y++ {
+				img.Set(y, x, color.Gray{Y: testImageData[i*dim+x*28+y]})
+			}
+		}
+		dst, err := os.Create("./data/image" + strconv.Itoa(i) + "-" + string(testLabelData[i]+'0') + "-" + strconv.Itoa(outputNumber) + ".jpeg")
+		check(err)
+		err = jpeg.Encode(dst, img, &jpeg.Options{Quality: 100})
+		check(err)
 	}
-	fmt.Println("Recognition rate: ", float64(successCase)/float64(testImageCount))
 }
