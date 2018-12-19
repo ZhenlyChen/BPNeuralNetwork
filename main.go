@@ -2,15 +2,24 @@ package main
 
 import (
 	"io/ioutil"
+	"os"
 	"strings"
 )
 
 func main() {
-	// train()
-	identify()
-	// test()
-	// outputImage()
-
+	if len(os.Args) < 2 {
+		return
+	}
+	switch os.Args[1] {
+	case "train":
+		train()
+	case "web":
+		identify()
+	case "test":
+		test()
+	case "output":
+		outputImage()
+	}
 }
 
 func outputLabel(labelData []byte) {
