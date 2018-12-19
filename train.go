@@ -32,7 +32,7 @@ func train() {
 	dim := imageRows * imageCols
 
 	// 隐含层节点数
-	hiddenNode := 256
+	hiddenNode := 144
 	// 初始化因子(推荐值：2.4-3)
 	alphaInit := 2.5
 	// 学习速率
@@ -43,10 +43,10 @@ func train() {
 	// 动量因子
 	alphaLast := 0.05
 	// 训练次数
-	trainingTimes := 1
+	trainingTimes := 3
 
 	// 是否读取之前的训练数据
-	readOld := true
+	readOld := false
 
 	inputLayer := make([]float64, dim)
 	hiddenLayer := make([]float64, hiddenNode)
@@ -107,7 +107,7 @@ func train() {
 	}
 
 	// fmt.Println(iTohWeight)
-	fmt.Println(hTooWeight)
+	// fmt.Println(hTooWeight)
 
 	// 训练次数
 	for t := 0; t < trainingTimes; t++ {
@@ -131,7 +131,6 @@ func train() {
 				} else {
 					inputLayer[j] = 0
 				}
-				// inputLayer[j] = float64(imagePart[j] ==)
 			}
 			// 计算隐含层
 			for j := 0; j < hiddenNode; j++ {
@@ -139,10 +138,8 @@ func train() {
 				for k := 0; k < dim; k++ {
 					hiddenLayer[j] += iTohWeight[j][k] * inputLayer[k]
 				}
-				// fmt.Println(hiddenLayer[j])
 				// 单极性Sigmoid函数
 				hiddenLayer[j] = 1.0 / (1 + math.Exp(-hiddenLayer[j]*alphaX))
-				// fmt.Println(hiddenLayer[j])
 			}
 			// 计算输出层
 			for j := 0; j < 10; j++ {
@@ -153,24 +150,22 @@ func train() {
 				// 单极性Sigmoid函数
 				outputLayer[j] = 1.0 / (1 + math.Exp(-outputLayer[j]*alphaX))
 			}
-			// fmt.Println("hidden: ",hiddenLayer)
 			// 计算预期输出
 			expectOutput := make([]float64, 10)
-			expectOutput[labelData[i]] = 1.0
-			// fmt.Println(expectOutput)
-			// fmt.Println(outputLayer)
+			for j := 0; j < 10; j++ {
+				expectOutput[j] = 0.001
+			}
+			expectOutput[labelData[i]] = 0.9999
 			// 计算误差
 			delta := make([]float64, 10)
 			for j := 0; j < 10; j++ {
 				delta[j] = (expectOutput[j] - outputLayer[j]) * outputLayer[j] * (1 - outputLayer[j])
 				for k := 0; k < hiddenNode; k++ {
-					deltaW :=  alphaV * delta[j] * hiddenLayer[k] + alphaLast * lastDeltaW[j][k]
+					deltaW := alphaV*delta[j]*hiddenLayer[k] + alphaLast*lastDeltaW[j][k]
 					hTooWeight[j][k] += deltaW
 					lastDeltaW[j][k] = deltaW
 				}
 			}
-			// fmt.Println(delta)
-			// fmt.Println(hTooWeight)
 
 			for j := 0; j < hiddenNode; j++ {
 				deltaY := 0.0
@@ -181,7 +176,7 @@ func train() {
 
 				for k := 0; k < dim; k++ {
 					deltaV := alphaW * deltaY * inputLayer[k]
-					iTohWeight[j][k] +=deltaV + alphaLast * lastDeltaV[j][k]
+					iTohWeight[j][k] += deltaV + alphaLast*lastDeltaV[j][k]
 					lastDeltaV[j][k] = deltaV
 				}
 			}
